@@ -16,6 +16,7 @@ public class ClienteDto extends PersonaDto{
         return banco;
     }
 
+    
     public void setBanco(String banco) {
         this.banco = banco;
     }
