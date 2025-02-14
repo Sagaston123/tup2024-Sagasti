@@ -1,4 +1,5 @@
-package ar.edu.utn.frbb.tup.controller;
+package ar.edu.utn.frbb.tup.model.dto;
+
 
 import ar.edu.utn.frbb.tup.model.TipoPersona;
 
