@@ -1,6 +1,6 @@
-package ar.edu.utn.frbb.tup.model.dto;
+package ar.edu.utn.frbb.tup.model.dtos;
 
-import ar.edu.utn.frbb.tup.model.dto.PlanPagoDto;
+import ar.edu.utn.frbb.tup.model.dtos.PlanPagoDto;
 
 public class PrestamoDto {
     private long numeroCliente;

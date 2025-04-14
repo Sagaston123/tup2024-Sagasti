@@ -1,4 +1,4 @@
-package ar.edu.utn.frbb.tup.model.dto;
+package ar.edu.utn.frbb.tup.model.dtos;
 
 import java.util.List;
 

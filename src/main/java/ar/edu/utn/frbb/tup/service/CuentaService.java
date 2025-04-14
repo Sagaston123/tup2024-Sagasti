@@ -1,7 +1,7 @@
 package ar.edu.utn.frbb.tup.service;
 
 import ar.edu.utn.frbb.tup.model.Cuenta;
-import ar.edu.utn.frbb.tup.model.dto.CuentaDto;
+import ar.edu.utn.frbb.tup.model.dtos.CuentaDto;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;

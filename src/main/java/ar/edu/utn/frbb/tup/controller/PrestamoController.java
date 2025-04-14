@@ -2,11 +2,11 @@ package ar.edu.utn.frbb.tup.controller;
 
 import ar.edu.utn.frbb.tup.controller.validator.PrestamoValidator;
 import ar.edu.utn.frbb.tup.model.Prestamo;
-import ar.edu.utn.frbb.tup.model.dto.PrestamoDto;
-import ar.edu.utn.frbb.tup.model.dto.PrestamosClienteResponse;
+import ar.edu.utn.frbb.tup.model.dtos.PrestamoDto;
+import ar.edu.utn.frbb.tup.model.dtos.PrestamosClienteResponse;
 import ar.edu.utn.frbb.tup.model.exception.PrestamoNotAllowedException;
 import ar.edu.utn.frbb.tup.service.PrestamoService;
-import ar.edu.utn.frbb.tup.model.dto.SolicitudPrestamoResponse;
+import ar.edu.utn.frbb.tup.model.dtos.SolicitudPrestamoResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
