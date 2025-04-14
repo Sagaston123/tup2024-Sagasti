@@ -1,6 +1,6 @@
 package ar.edu.utn.frbb.tup.model;
 
-import ar.edu.utn.frbb.tup.controller.ClienteDto;
+import ar.edu.utn.frbb.tup.model.dto.ClienteDto;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

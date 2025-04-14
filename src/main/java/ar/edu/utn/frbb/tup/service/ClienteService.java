@@ -1,12 +1,15 @@
 package ar.edu.utn.frbb.tup.service;
 
-import ar.edu.utn.frbb.tup.controller.ClienteDto;
+import ar.edu.utn.frbb.tup.model.dto.ClienteDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ClienteService {
@@ -44,9 +47,13 @@ public class ClienteService {
 
     public Cliente buscarClientePorDni(long dni) {
         Cliente cliente = clienteDao.find(dni, true);
-        if(cliente == null) {
+        if (cliente == null) {
             throw new IllegalArgumentException("El cliente no existe");
         }
         return cliente;
+    }
+
+    public List<Cliente> listarTodos() {
+        return clienteDao.getAll();
     }
 }

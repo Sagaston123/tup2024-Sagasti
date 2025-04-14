@@ -1,5 +1,7 @@
 package ar.edu.utn.frbb.tup.model.dto;
 
+import ar.edu.utn.frbb.tup.model.dto.PlanPagoDto;
+
 public class PrestamoDto {
     private long numeroCliente;
     private int plazoMeses;

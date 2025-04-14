@@ -29,7 +29,7 @@ public class ClienteController {
 
     @GetMapping("/{dni}")
     public Cliente buscarClientePorDni(@PathVariable long dni) throws ClienteNotFoundException {
-        return clienteService.buscarPorDni(dni);
+        return clienteService.buscarClientePorDni(dni);
     }
 
     @GetMapping

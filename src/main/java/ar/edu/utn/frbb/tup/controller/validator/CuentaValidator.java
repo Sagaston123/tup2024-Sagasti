@@ -1,4 +1,5 @@
-package main.java.ar.edu.utn.frbb.tup.controller.validator;
+package ar.edu.utn.frbb.tup.controller.validator;
+
 
 import ar.edu.utn.frbb.tup.model.dto.CuentaDto;
 import org.springframework.stereotype.Component;

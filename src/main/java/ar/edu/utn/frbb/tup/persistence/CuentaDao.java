@@ -1,5 +1,6 @@
 package ar.edu.utn.frbb.tup.persistence;
 
+import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
 import ar.edu.utn.frbb.tup.persistence.entity.CuentaEntity;
@@ -26,6 +27,13 @@ public class CuentaDao  extends AbstractBaseDao{
         }
         return ((CuentaEntity) getInMemoryDatabase().get(id)).toCuenta();
     }
+
+    public List<Cuenta> getAll() {
+        return getInMemoryDatabase().values().stream()
+                .map(obj -> ((CuentaEntity) obj).toCuenta())
+                .toList(); 
+    }
+    
 
     public List<Cuenta> getCuentasByCliente(long dni) {
         List<Cuenta> cuentasDelCliente = new ArrayList<>();

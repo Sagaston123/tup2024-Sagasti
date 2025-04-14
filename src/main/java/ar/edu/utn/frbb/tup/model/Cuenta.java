@@ -2,11 +2,14 @@ package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDateTime;
 import java.util.Random;
+import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
+import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
+
 
 public class Cuenta {
     private long numeroCuenta;
     LocalDateTime fechaCreacion;
-    int balance;
+    double balance;
     TipoCuenta tipoCuenta;
     Cliente titular;
     TipoMoneda moneda;
@@ -54,11 +57,11 @@ public class Cuenta {
         return this;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public Cuenta setBalance(int balance) {
+    public Cuenta setBalance(double balance) {
         this.balance = balance;
         return this;
     }

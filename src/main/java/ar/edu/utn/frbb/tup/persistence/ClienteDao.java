@@ -3,6 +3,9 @@ package ar.edu.utn.frbb.tup.persistence;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.persistence.entity.ClienteEntity;
+
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +33,14 @@ public class ClienteDao extends AbstractBaseDao{
         ClienteEntity entity = new ClienteEntity(cliente);
         getInMemoryDatabase().put(entity.getId(), entity);
     }
+
+    public List<Cliente> getAll() {
+        return getInMemoryDatabase().values().stream()
+                .map(obj -> ((ClienteEntity) obj).toCliente())
+                .toList();
+    }
+    
+    
 
     @Override
     protected String getEntityName() {

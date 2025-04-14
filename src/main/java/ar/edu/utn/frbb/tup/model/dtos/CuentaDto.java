@@ -20,6 +20,8 @@ public class CuentaDto {
         return tipoCuenta;
     }
 
+    
+
     public void setTipoCuenta(String tipoCuenta) {
         this.tipoCuenta = tipoCuenta;
     }
@@ -39,4 +41,5 @@ public class CuentaDto {
     public void setSaldoInicial(double saldoInicial) {
         this.saldoInicial = saldoInicial;
     }
+
 }
