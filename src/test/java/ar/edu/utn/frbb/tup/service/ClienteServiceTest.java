@@ -54,7 +54,7 @@ public class ClienteServiceTest {
         ClienteDto cliente = new ClienteDto();
         cliente.setFechaNacimiento("1978-03-18");
         cliente.setDni(29857643);
-        cliente.setTipoPersona(TipoPersona.PERSONA_FISICA.toString());
+       // cliente.setTipoPersona(TipoPersona.PERSONA_FISICA.toString());
         Cliente clienteEntity = clienteService.darDeAltaCliente(cliente);
 
         verify(clienteDao, times(1)).save(clienteEntity);
@@ -67,7 +67,7 @@ public class ClienteServiceTest {
         pepeRino.setNombre("Pepe");
         pepeRino.setApellido("Rino");
         pepeRino.setFechaNacimiento("1978-03-18");
-        pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA.toString());
+       // pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA.toString());
 
         when(clienteDao.find(26456437, false)).thenReturn(new Cliente());
 

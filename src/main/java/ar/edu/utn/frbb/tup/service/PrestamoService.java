@@ -23,9 +23,6 @@ public class PrestamoService {
     private ClienteService clienteService;
 
     @Autowired
-    private CuentaService cuentaService;
-
-    @Autowired
     private PrestamoDao prestamoDao;
 
     @Autowired

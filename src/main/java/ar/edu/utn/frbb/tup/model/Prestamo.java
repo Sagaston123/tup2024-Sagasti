@@ -10,9 +10,18 @@ public class Prestamo {
     private TipoMoneda moneda;
     private int plazoMeses;
     private int pagosRealizados;
+    private String banco;
     private double saldoRestante;
     private LocalDate fecha;
 
+    public String getBanco() {
+        return banco;
+    }
+
+    public void setBanco(String banco) {
+        this.banco = banco;
+    }
+    
     public Cliente getTitular() {
         return titular;
     }

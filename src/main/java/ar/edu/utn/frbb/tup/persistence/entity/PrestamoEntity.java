@@ -12,6 +12,7 @@ public class PrestamoEntity extends BaseEntity {
     private int pagosRealizados;
     private double saldoRestante;
     private String moneda;
+    private String banco;
     private LocalDate fecha;
 
     public PrestamoEntity(Prestamo prestamo) {
@@ -22,6 +23,7 @@ public class PrestamoEntity extends BaseEntity {
         this.pagosRealizados = prestamo.getPagosRealizados();
         this.saldoRestante = prestamo.getSaldoRestante();
         this.moneda = prestamo.getMoneda().toString();
+        this.banco = prestamo.getBanco();
         this.fecha = prestamo.getFecha();
     }
 
@@ -33,11 +35,18 @@ public class PrestamoEntity extends BaseEntity {
         p.setPagosRealizados(pagosRealizados);
         p.setSaldoRestante(saldoRestante);
         p.setMoneda(TipoMoneda.valueOf(moneda));
+        p.setBanco(banco);
         p.setFecha(fecha);
         return p;
     }
 
     //getters y setters
+    public String getBanco() {
+        return banco;
+    }
+    public void setBanco(String banco) {
+        this.banco = banco;
+    }
     public long getClienteId() {
         return clienteId;
     }

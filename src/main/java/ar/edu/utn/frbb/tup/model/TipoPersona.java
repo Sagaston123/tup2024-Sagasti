@@ -17,10 +17,10 @@ public enum TipoPersona {
 
     public static TipoPersona fromString(String text) {
         for (TipoPersona tipo : TipoPersona.values()) {
-            if (tipo.descripcion.equalsIgnoreCase(text)) {
+            if (tipo.name().equalsIgnoreCase(text) || tipo.descripcion.equalsIgnoreCase(text)) {
                 return tipo;
             }
         }
-        throw new IllegalArgumentException("No se pudo encontrar un TipoPersona con la descripción: " + text);
+        throw new IllegalArgumentException("No se pudo encontrar un TipoPersona con el texto: " + text);
     }
 }

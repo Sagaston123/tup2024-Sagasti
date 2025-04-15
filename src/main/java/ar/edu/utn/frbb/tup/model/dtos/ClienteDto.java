@@ -1,14 +1,16 @@
 package ar.edu.utn.frbb.tup.model.dtos;
 
+import ar.edu.utn.frbb.tup.model.TipoPersona;
+
 public class ClienteDto extends PersonaDto{
-    private String tipoPersona;
+    private TipoPersona tipoPersona;
     private String banco;
 
-    public String getTipoPersona() {
+    public TipoPersona getTipoPersona() {
         return tipoPersona;
     }
 
-    public void setTipoPersona(String tipoPersona) {
+    public void setTipoPersona(TipoPersona tipoPersona) {
         this.tipoPersona = tipoPersona;
     }
 
