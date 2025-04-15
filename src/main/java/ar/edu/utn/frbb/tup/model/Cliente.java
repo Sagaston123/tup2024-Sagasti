@@ -5,6 +5,8 @@ import ar.edu.utn.frbb.tup.model.dtos.ClienteDto;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 public class Cliente extends Persona {
 
@@ -47,7 +49,7 @@ public class Cliente extends Persona {
     public void setFechaAlta(LocalDate fechaAlta) {
         this.fechaAlta = fechaAlta;
     }
-
+    @JsonManagedReference   //Para q no haga recursion infinita (inclui las cuentas pero no al titular de nuevo)
     public Set<Cuenta> getCuentas() {
         return cuentas;
     }

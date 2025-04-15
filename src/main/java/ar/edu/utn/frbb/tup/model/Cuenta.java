@@ -1,10 +1,10 @@
 package ar.edu.utn.frbb.tup.model;
 
 import java.time.LocalDateTime;
-import java.util.Random;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
-
 
 public class Cuenta {
     private long numeroCuenta;
@@ -15,11 +15,10 @@ public class Cuenta {
     TipoMoneda moneda;
 
     public Cuenta() {
-        this.numeroCuenta = new Random().nextLong();
-        this.balance = 0;
+        this.balance = 0; //El id se genera en CuentaService
         this.fechaCreacion = LocalDateTime.now();
     }
-
+    @JsonBackReference //Para q no haga recursion infinita (no incluyas al titular de nuevo)
     public Cliente getTitular() {
         return titular;
     }

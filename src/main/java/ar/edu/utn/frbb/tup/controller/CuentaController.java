@@ -2,6 +2,7 @@ package ar.edu.utn.frbb.tup.controller;
 
 import ar.edu.utn.frbb.tup.controller.validator.CuentaValidator;
 import ar.edu.utn.frbb.tup.model.Cuenta;
+import ar.edu.utn.frbb.tup.model.dtos.CuentaConTitularDto;
 import ar.edu.utn.frbb.tup.model.dtos.CuentaDto;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaNotFoundException;
@@ -32,9 +33,10 @@ public class CuentaController {
 
 
     @GetMapping("/{numeroCuenta}")
-    public Cuenta consultarCuenta(@PathVariable long numeroCuenta) throws CuentaNotFoundException {
-        return cuentaService.consultarCuenta(numeroCuenta);
+    public CuentaConTitularDto consultarCuenta(@PathVariable long numeroCuenta) throws CuentaNotFoundException {
+        return cuentaService.consultarCuentaConTitular(numeroCuenta);
     }
+
 
     @GetMapping
     public List<Cuenta> listarCuentas() {

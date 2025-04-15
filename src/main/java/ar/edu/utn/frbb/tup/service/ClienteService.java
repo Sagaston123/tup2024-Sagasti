@@ -53,6 +53,9 @@ public class ClienteService {
     }
 
     public List<Cliente> listarTodos() {
-        return clienteDao.getAll();
+        return clienteDao.getAll().stream()
+            .map(c -> clienteDao.find(c.getDni(), true)) // recarga cada cliente con cuentas
+            .toList();
     }
+    
 }
