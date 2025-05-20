@@ -22,7 +22,7 @@ public class PrestamoDao extends AbstractBaseDao {
     public List<Prestamo> findByClienteId(long clienteId) {
         return getInMemoryDatabase().values().stream()
                 .map(p -> ((PrestamoEntity) p).toPrestamo())
-                .filter(p -> p.getTitular() != null && p.getTitular().getDni() == clienteId)
+                .filter(p -> p.getClienteId() == clienteId) 
                 .collect(Collectors.toList());
     }
 }

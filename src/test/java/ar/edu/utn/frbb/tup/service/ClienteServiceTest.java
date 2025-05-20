@@ -1,34 +1,29 @@
 package ar.edu.utn.frbb.tup.service;
 
-import ar.edu.utn.frbb.tup.model.dtos.ClienteDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.TipoPersona;
+import ar.edu.utn.frbb.tup.model.dtos.ClienteDto;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ClienteServiceTest {
 
     @Mock
@@ -40,100 +35,128 @@ public class ClienteServiceTest {
     @InjectMocks
     private ClienteService clienteService;
 
-    @BeforeAll
-    public void setUp() {
-        MockitoAnnotations.openMocks(this);
+    private ClienteDto buildDto(long dni, String nacimiento) {
+        ClienteDto dto = new ClienteDto();
+        dto.setDni(dni);
+        dto.setNombre("Juan");
+        dto.setApellido("Pérez");
+        dto.setFechaNacimiento(nacimiento);
+        dto.setBanco("Banco Falso");
+        dto.setTipoPersona(TipoPersona.PERSONA_FISICA);
+        return dto;
     }
 
     @Test
-    public void testClienteMenor18Años() {
-        ClienteDto clienteMenorDeEdad = new ClienteDto();
-        clienteMenorDeEdad.setFechaNacimiento("2020-03-18");
-        assertThrows(IllegalArgumentException.class, () -> clienteService.darDeAltaCliente(clienteMenorDeEdad));
+    public void testDarDeAltaCliente_OK() throws Exception {
+        ClienteDto dto = buildDto(12345678L, "1990-01-01");
+        when(clienteDao.find(dto.getDni(), false)).thenReturn(null);
+
+        Cliente cliente = clienteService.darDeAltaCliente(dto);
+
+        assertEquals(dto.getDni(), cliente.getDni());
+        verify(clienteDao).save(any(Cliente.class));
     }
 
     @Test
-    public void testClienteSuccess() throws ClienteAlreadyExistsException {
-        ClienteDto cliente = new ClienteDto();
-        cliente.setFechaNacimiento("1978-03-18");
-        cliente.setDni(29857643);
+    public void testDarDeAltaCliente_YaExiste() {
+        ClienteDto dto = buildDto(12345678L, "1990-01-01");
+        Cliente existente = new Cliente();
+        existente.setDni(12345678L);
+        when(clienteDao.find(dto.getDni(), false)).thenReturn(existente);
 
-        when(clienteDao.find(29857643, false)).thenReturn(null);
-
-        Cliente clienteEntity = clienteService.darDeAltaCliente(cliente);
-
-        verify(clienteDao, times(1)).save(clienteEntity);
+        assertThrows(ClienteAlreadyExistsException.class, () -> clienteService.darDeAltaCliente(dto));
     }
 
     @Test
-    public void testClienteAlreadyExistsException() throws ClienteAlreadyExistsException {
-        ClienteDto pepeRino = new ClienteDto();
-        pepeRino.setDni(26456437);
-        pepeRino.setNombre("Pepe");
-        pepeRino.setApellido("Rino");
-        pepeRino.setFechaNacimiento("1978-03-18");
+    public void testDarDeAltaCliente_MenorDeEdad() {
+        ClienteDto dto = buildDto(12345678L, LocalDate.now().minusYears(10).toString());
+        when(clienteDao.find(dto.getDni(), false)).thenReturn(null);
 
-        when(clienteDao.find(26456437, false)).thenReturn(new Cliente());
-
-        assertThrows(ClienteAlreadyExistsException.class, () -> clienteService.darDeAltaCliente(pepeRino));
+        assertThrows(IllegalArgumentException.class, () -> clienteService.darDeAltaCliente(dto));
     }
 
     @Test
-    public void testValidarCuentaNuevaSuccess() throws TipoCuentaAlreadyExistsException, ClienteNotFoundException {
-        Cliente pepeRino = new Cliente();
-        pepeRino.setDni(26456439);
-        pepeRino.setNombre("Pepe");
-        pepeRino.setApellido("Rino");
-        pepeRino.setFechaNacimiento(LocalDate.of(1978, 3,25));
-        pepeRino.setTipoPersona(TipoPersona.PERSONA_FISICA);
-
-        Cuenta cuenta = new Cuenta()
+    public void testValidarCuentaNueva_OK() throws Exception {
+        long dni = 12345678L;
+        Cuenta nueva = new Cuenta()
+                .setTipoCuenta(TipoCuenta.CAJA_AHORRO)
                 .setMoneda(TipoMoneda.PESOS)
-                .setBalance(500000)
-                .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+                .setBalance(1000);
+        nueva.setDniTitular(dni);
 
-        when(clienteDao.find(26456439, false)).thenReturn(pepeRino);
-        when(cuentaDao.getAll()).thenReturn(new ArrayList<>());
+        when(clienteDao.find(dni, false)).thenReturn(new Cliente());
+        when(cuentaDao.getAll()).thenReturn(List.of()); // sin cuentas duplicadas
 
-        // No debe lanzar excepción
-        clienteService.validarCuentaNueva(cuenta, pepeRino.getDni());
+        clienteService.validarCuentaNueva(nueva, dni);
     }
 
     @Test
-    public void testValidarCuentaNuevaDuplicada() throws TipoCuentaAlreadyExistsException, ClienteNotFoundException {
-        Cliente luciano = new Cliente();
-        luciano.setDni(26456439);
-        luciano.setNombre("Luciano");
-        luciano.setApellido("Perez");
-        luciano.setFechaNacimiento(LocalDate.of(1980, 1, 1));
-        luciano.setTipoPersona(TipoPersona.PERSONA_FISICA);
+    public void testValidarCuentaNueva_Duplicada() {
+        long dni = 12345678L;
 
-        Cuenta cuentaExistente = new Cuenta()
-                .setMoneda(TipoMoneda.PESOS)
-                .setBalance(1000)
-                .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
-        cuentaExistente.setDniTitular(26456439);
+        Cuenta existente = new Cuenta()
+                .setTipoCuenta(TipoCuenta.CAJA_AHORRO)
+                .setMoneda(TipoMoneda.PESOS);
+        existente.setDniTitular(dni);
 
-        when(clienteDao.find(26456439, false)).thenReturn(luciano);
-        when(cuentaDao.getAll()).thenReturn(List.of(cuentaExistente));
+        Cuenta nueva = new Cuenta()
+                .setTipoCuenta(TipoCuenta.CAJA_AHORRO)
+                .setMoneda(TipoMoneda.PESOS);
+        nueva.setDniTitular(dni);
 
-        Cuenta cuentaDuplicada = new Cuenta()
-                .setMoneda(TipoMoneda.PESOS)
-                .setBalance(500000)
-                .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+        when(clienteDao.find(dni, false)).thenReturn(new Cliente());
+        when(cuentaDao.getAll()).thenReturn(List.of(existente));
 
-        assertThrows(TipoCuentaAlreadyExistsException.class, () -> clienteService.validarCuentaNueva(cuentaDuplicada, luciano.getDni()));
+        assertThrows(TipoCuentaAlreadyExistsException.class, () -> clienteService.validarCuentaNueva(nueva, dni));
     }
 
     @Test
-    public void testValidarCuentaNuevaClienteNoExiste() {
-        Cuenta cuenta = new Cuenta()
-                .setMoneda(TipoMoneda.PESOS)
-                .setBalance(500000)
-                .setTipoCuenta(TipoCuenta.CAJA_AHORRO);
+    public void testValidarCuentaNueva_ClienteNoExiste() {
+        long dni = 12345678L;
+        Cuenta cuenta = new Cuenta().setTipoCuenta(TipoCuenta.CAJA_AHORRO).setMoneda(TipoMoneda.PESOS);
+        cuenta.setDniTitular(dni);
 
-        when(clienteDao.find(12345678, false)).thenReturn(null);
+        when(clienteDao.find(dni, false)).thenReturn(null);
 
-        assertThrows(ClienteNotFoundException.class, () -> clienteService.validarCuentaNueva(cuenta, 12345678));
+        assertThrows(ClienteNotFoundException.class, () -> clienteService.validarCuentaNueva(cuenta, dni));
+    }
+
+    @Test
+    public void testBuscarClientePorDni_OK() throws Exception {
+        Cliente esperado = new Cliente();
+        esperado.setDni(12345678L);
+
+        when(clienteDao.find(12345678L, true)).thenReturn(esperado);
+
+        Cliente resultado = clienteService.buscarClientePorDni(12345678L);
+
+        assertEquals(12345678L, resultado.getDni());
+    }
+
+    @Test
+    public void testBuscarClientePorDni_NoExiste() {
+        when(clienteDao.find(12345678L, true)).thenReturn(null);
+
+        assertThrows(ClienteNotFoundException.class, () -> clienteService.buscarClientePorDni(12345678L));
+    }
+
+    @Test
+    public void testListarTodosClientes_OK() {
+        Cliente c1 = new Cliente(); c1.setDni(1L);
+        Cliente c2 = new Cliente(); c2.setDni(2L);
+        when(clienteDao.getAll()).thenReturn(List.of(c1, c2));
+
+        List<Cliente> lista = clienteService.listarTodos();
+
+        assertEquals(2, lista.size());
+    }
+
+    @Test
+    public void testListarTodosClientes_Vacio() {
+        when(clienteDao.getAll()).thenReturn(List.of());
+
+        List<Cliente> lista = clienteService.listarTodos();
+
+        assertTrue(lista.isEmpty());
     }
 }

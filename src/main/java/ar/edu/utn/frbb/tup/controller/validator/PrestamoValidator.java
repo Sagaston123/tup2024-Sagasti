@@ -23,6 +23,5 @@ public class PrestamoValidator {
             throw new IllegalArgumentException("Número de cliente inválido");
         }
 
-        // Podés agregar otras validaciones, como si el monto supera un límite permitido
     }
 }

@@ -8,7 +8,6 @@ import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,11 +16,11 @@ import java.util.List;
 public class ClienteService {
 
     private final ClienteDao clienteDao;
-    @Autowired
-    private CuentaDao cuentaDao;
+    private final CuentaDao cuentaDao;
 
-    public ClienteService(ClienteDao clienteDao) {
+    public ClienteService(ClienteDao clienteDao, CuentaDao cuentaDao) {
         this.clienteDao = clienteDao;
+        this.cuentaDao = cuentaDao;
     }
 
     public Cliente darDeAltaCliente(ClienteDto clienteDto) throws ClienteAlreadyExistsException {
@@ -40,12 +39,10 @@ public class ClienteService {
     }
 
     public void validarCuentaNueva(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException, ClienteNotFoundException {
-        // Validar que el cliente exista
         if (clienteDao.find(dniTitular, false) == null) {
             throw new ClienteNotFoundException();
         }
 
-        // Validar que no tenga otra cuenta igual (tipo y moneda)
         boolean yaTiene = cuentaDao.getAll().stream()
             .anyMatch(c -> c.getDniTitular() == dniTitular
                 && c.getTipoCuenta() == cuenta.getTipoCuenta()

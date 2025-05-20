@@ -13,6 +13,7 @@ import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
+import ar.edu.utn.frbb.tup.model.exception.TransferenciaInvalidaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
@@ -137,8 +138,14 @@ public class CuentaService {
     }
 
     public void transferir(long origen, long destino, double monto) throws CuentaNotFoundException, CantidadNegativaException, NoAlcanzaException, TipoCuentaNotSupportedException {
+        
+        if (origen == destino) {    //Tiene que ser aca para que apunten a la misma cuenta
+            throw new TransferenciaInvalidaException("No se puede transferir a la misma cuenta.");
+        }
+
         Cuenta cuentaOrigen = consultarCuenta(origen);
         Cuenta cuentaDestino = consultarCuenta(destino);
+        
         if (monto < 0) {
             throw new CantidadNegativaException();
         }

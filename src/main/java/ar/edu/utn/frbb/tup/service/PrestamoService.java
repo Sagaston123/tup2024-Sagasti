@@ -10,6 +10,7 @@ import ar.edu.utn.frbb.tup.model.dtos.PlanPagoDto;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.PrestamoNotAllowedException;
 import ar.edu.utn.frbb.tup.persistence.PrestamoDao;
+import ar.edu.utn.frbb.tup.persistence.PrestamoIdGenerator;
 import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,6 @@ public class PrestamoService {
             throw new PrestamoNotAllowedException("El cliente no tiene una buena calificación crediticia.");
         }
 
-        // Buscar cuentas del cliente por DNI
         List<Cuenta> cuentasDelCliente = cuentaDao.getCuentasByCliente(cliente.getDni());
 
         Cuenta cuentaDestino = cuentasDelCliente.stream()
@@ -60,6 +60,7 @@ public class PrestamoService {
         }
 
         Prestamo prestamo = new Prestamo();
+        prestamo.setId(PrestamoIdGenerator.generarNuevoId());
         prestamo.setClienteId(cliente.getDni());
         prestamo.setMonto(monto);
         prestamo.setPlazoMeses(plazo);
@@ -69,7 +70,7 @@ public class PrestamoService {
         prestamo.setSaldoRestante(monto);
 
         cuentaDestino.setBalance(cuentaDestino.getBalance() + monto);
-
+        cuentaDao.save(cuentaDestino);
         prestamoDao.save(prestamo);
 
         return new SolicitudPrestamoResponse("APROBADO",
@@ -78,6 +79,7 @@ public class PrestamoService {
     }
 
     public List<Prestamo> obtenerPrestamosPorCliente(long clienteId) {
+        clienteService.buscarClientePorDni(clienteId); 
         return prestamoDao.findByClienteId(clienteId);
     }
 }

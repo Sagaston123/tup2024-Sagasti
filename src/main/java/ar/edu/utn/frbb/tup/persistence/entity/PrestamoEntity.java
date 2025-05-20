@@ -30,6 +30,7 @@ public class PrestamoEntity extends BaseEntity {
     public Prestamo toPrestamo() {
         Prestamo p = new Prestamo();
         p.setId(getId());
+        p.setClienteId(this.clienteId);
         p.setMonto(monto);
         p.setPlazoMeses(plazoMeses);
         p.setPagosRealizados(pagosRealizados);

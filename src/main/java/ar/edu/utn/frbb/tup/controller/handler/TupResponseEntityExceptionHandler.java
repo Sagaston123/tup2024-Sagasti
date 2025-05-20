@@ -1,11 +1,13 @@
 package ar.edu.utn.frbb.tup.controller.handler;
 
 import ar.edu.utn.frbb.tup.model.exception.*;
+import io.micrometer.common.lang.NonNull;
+import io.micrometer.common.lang.Nullable;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.ServletWebRequest;
@@ -20,6 +22,7 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
             TipoCuentaAlreadyExistsException.class,
             ClienteAlreadyExistsException.class,
             PrestamoNotAllowedException.class,
+            TransferenciaInvalidaException.class,       
             IllegalArgumentException.class
     })
     protected ResponseEntity<Object> handleBadRequest(Exception ex, WebRequest request) {
@@ -38,10 +41,10 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(
             Exception ex,
-            Object body,
+            @Nullable Object body,
             HttpHeaders headers,
-            HttpStatusCode statusCode,
-            WebRequest request
+            @NonNull HttpStatusCode statusCode,
+            @NonNull WebRequest request
     ) {
         if (body == null) {
             CustomApiError error = new CustomApiError();
@@ -51,8 +54,6 @@ public class TupResponseEntityExceptionHandler extends ResponseEntityExceptionHa
 
         return new ResponseEntity<>(body, headers, statusCode);
     }
-
-
 
     private ResponseEntity<Object> buildCustomErrorResponse(Exception ex, HttpStatus status, WebRequest request) {
         CustomApiError error = buildErrorObject(ex, status, request);
