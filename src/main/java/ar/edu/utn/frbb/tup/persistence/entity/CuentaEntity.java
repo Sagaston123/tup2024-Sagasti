@@ -6,12 +6,12 @@ import ar.edu.utn.frbb.tup.model.TipoMoneda;
 
 import java.time.LocalDateTime;
 
-public class CuentaEntity extends BaseEntity{
+public class CuentaEntity extends BaseEntity {
     private String moneda;
     private LocalDateTime fechaCreacion;
     private double balance;
     private String tipoCuenta;
-    private long titular;
+    private long dniTitular;
     private long numeroCuenta;
 
     public CuentaEntity(Cuenta cuenta) {
@@ -20,7 +20,7 @@ public class CuentaEntity extends BaseEntity{
         this.balance = cuenta.getBalance();
         this.tipoCuenta = cuenta.getTipoCuenta().toString();
         this.moneda = cuenta.getMoneda().toString();
-        this.titular = cuenta.getTitular().getDni();
+        this.dniTitular = cuenta.getDniTitular();
         this.fechaCreacion = cuenta.getFechaCreacion();
     }
 
@@ -31,8 +31,11 @@ public class CuentaEntity extends BaseEntity{
         cuenta.setTipoCuenta(TipoCuenta.valueOf(this.tipoCuenta));
         cuenta.setMoneda(TipoMoneda.valueOf(this.moneda));
         cuenta.setFechaCreacion(this.fechaCreacion);
+        cuenta.setDniTitular(this.dniTitular);
         return cuenta;
     }
+
+    // Getters y setters...
 
     public String getMoneda() {
         return moneda;
@@ -66,12 +69,12 @@ public class CuentaEntity extends BaseEntity{
         this.tipoCuenta = tipoCuenta;
     }
 
-    public Long getTitular() {
-        return titular;
+    public long getDniTitular() {
+        return dniTitular;
     }
 
-    public void setTitular(Long titular) {
-        this.titular = titular;
+    public void setDniTitular(long dniTitular) {
+        this.dniTitular = dniTitular;
     }
 
     public long getNumeroCuenta() {

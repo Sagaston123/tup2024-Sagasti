@@ -7,6 +7,7 @@ import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +29,9 @@ public class ClienteController {
     }
 
     @GetMapping("/{dni}")
-    public Cliente buscarClientePorDni(@PathVariable long dni) throws ClienteNotFoundException {
-        return clienteService.buscarClientePorDni(dni);
+    public ResponseEntity<Cliente> buscarClientePorDni(@PathVariable long dni) throws ClienteNotFoundException {
+        Cliente cliente = clienteService.buscarClientePorDni(dni);
+        return ResponseEntity.ok(cliente);
     }
 
     @GetMapping

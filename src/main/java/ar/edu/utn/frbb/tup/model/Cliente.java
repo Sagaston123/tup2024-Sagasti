@@ -1,19 +1,13 @@
 package ar.edu.utn.frbb.tup.model;
 
 import ar.edu.utn.frbb.tup.model.dtos.ClienteDto;
-
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 
 public class Cliente extends Persona {
 
     private TipoPersona tipoPersona;
     private String banco;
     private LocalDate fechaAlta;
-    private Set<Cuenta> cuentas = new HashSet<>();
 
     public Cliente() {
         super();
@@ -49,24 +43,6 @@ public class Cliente extends Persona {
     public void setFechaAlta(LocalDate fechaAlta) {
         this.fechaAlta = fechaAlta;
     }
-    @JsonManagedReference   //Para q no haga recursion infinita (inclui las cuentas pero no al titular de nuevo)
-    public Set<Cuenta> getCuentas() {
-        return cuentas;
-    }
-
-    public void addCuenta(Cuenta cuenta) {
-        this.cuentas.add(cuenta);
-        cuenta.setTitular(this);
-    }
-
-    public boolean tieneCuenta(TipoCuenta tipoCuenta, TipoMoneda moneda) {
-        for (Cuenta cuenta : cuentas) {
-            if (tipoCuenta.equals(cuenta.getTipoCuenta()) && moneda.equals(cuenta.getMoneda())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Override
     public String toString() {
@@ -74,7 +50,6 @@ public class Cliente extends Persona {
                 "tipoPersona=" + tipoPersona +
                 ", banco='" + banco + '\'' +
                 ", fechaAlta=" + fechaAlta +
-                ", cuentas=" + cuentas +
                 '}';
     }
 }

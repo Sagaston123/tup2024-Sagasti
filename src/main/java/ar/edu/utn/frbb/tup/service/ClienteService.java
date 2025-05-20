@@ -4,8 +4,11 @@ import ar.edu.utn.frbb.tup.model.dtos.ClienteDto;
 import ar.edu.utn.frbb.tup.model.Cliente;
 import ar.edu.utn.frbb.tup.model.Cuenta;
 import ar.edu.utn.frbb.tup.model.exception.ClienteAlreadyExistsException;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
+import ar.edu.utn.frbb.tup.persistence.CuentaDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +16,9 @@ import java.util.List;
 @Service
 public class ClienteService {
 
-    ClienteDao clienteDao;
+    private final ClienteDao clienteDao;
+    @Autowired
+    private CuentaDao cuentaDao;
 
     public ClienteService(ClienteDao clienteDao) {
         this.clienteDao = clienteDao;
@@ -34,28 +39,32 @@ public class ClienteService {
         return cliente;
     }
 
-    public void agregarCuenta(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException {
-        Cliente titular = buscarClientePorDni(dniTitular);
-        cuenta.setTitular(titular);
-        if (titular.tieneCuenta(cuenta.getTipoCuenta(), cuenta.getMoneda())) {
+    public void validarCuentaNueva(Cuenta cuenta, long dniTitular) throws TipoCuentaAlreadyExistsException, ClienteNotFoundException {
+        // Validar que el cliente exista
+        if (clienteDao.find(dniTitular, false) == null) {
+            throw new ClienteNotFoundException();
+        }
+
+        // Validar que no tenga otra cuenta igual (tipo y moneda)
+        boolean yaTiene = cuentaDao.getAll().stream()
+            .anyMatch(c -> c.getDniTitular() == dniTitular
+                && c.getTipoCuenta() == cuenta.getTipoCuenta()
+                && c.getMoneda() == cuenta.getMoneda());
+
+        if (yaTiene) {
             throw new TipoCuentaAlreadyExistsException("El cliente ya posee una cuenta de ese tipo y moneda");
         }
-        titular.addCuenta(cuenta);
-        clienteDao.save(titular);
     }
 
-    public Cliente buscarClientePorDni(long dni) {
+    public Cliente buscarClientePorDni(long dni) throws ClienteNotFoundException {
         Cliente cliente = clienteDao.find(dni, true);
         if (cliente == null) {
-            throw new IllegalArgumentException("El cliente no existe");
+            throw new ClienteNotFoundException();
         }
         return cliente;
     }
 
     public List<Cliente> listarTodos() {
-        return clienteDao.getAll().stream()
-            .map(c -> clienteDao.find(c.getDni(), true)) // recarga cada cliente con cuentas
-            .toList();
+        return clienteDao.getAll();
     }
-    
 }

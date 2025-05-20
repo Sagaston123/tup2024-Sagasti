@@ -31,14 +31,12 @@ public class CuentaDao  extends AbstractBaseDao{
                 .map(obj -> ((CuentaEntity) obj).toCuenta())
                 .toList(); 
     }
-    
 
     public List<Cuenta> getCuentasByCliente(long dni) {
         List<Cuenta> cuentasDelCliente = new ArrayList<>();
-        for (Object object:
-                getInMemoryDatabase().values()) {
+        for (Object object : getInMemoryDatabase().values()) {
             CuentaEntity cuenta = ((CuentaEntity) object);
-            if (cuenta.getTitular().equals(dni)) {
+            if (cuenta.getDniTitular() == dni) {
                 cuentasDelCliente.add(cuenta.toCuenta());
             }
         }

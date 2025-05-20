@@ -7,8 +7,11 @@ import ar.edu.utn.frbb.tup.model.dtos.CuentaDto;
 import ar.edu.utn.frbb.tup.model.TipoCuenta;
 import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.persistence.CuentaIdGenerator;
+import ar.edu.utn.frbb.tup.model.exception.CantidadNegativaException;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.CuentaNotFoundException;
+import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.persistence.ClienteDao;
@@ -22,29 +25,36 @@ import java.util.List;
 @Service
 public class CuentaService {
 
-    CuentaDao cuentaDao = new CuentaDao();
+    @Autowired
+    private CuentaDao cuentaDao;
 
     @Autowired
     private ClienteDao clienteDao;
 
     @Autowired
-    ClienteService clienteService;
+    private ClienteService clienteService;
 
     public void darDeAltaCuenta(Cuenta cuenta, long dniTitular)
-            throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException {
+            throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, ClienteNotFoundException {
 
         if (cuentaDao.find(cuenta.getNumeroCuenta()) != null) {
             throw new CuentaAlreadyExistsException("La cuenta " + cuenta.getNumeroCuenta() + " ya existe.");
         }
 
-        // Validar tipo de cuenta soportada si hace falta
+        // Validar reglas de negocio del cliente antes de guardar la cuenta
+        clienteService.validarCuentaNueva(cuenta, dniTitular);
 
-        clienteService.agregarCuenta(cuenta, dniTitular);
         cuentaDao.save(cuenta);
     }
 
     public Cuenta crearCuenta(CuentaDto cuentaDto, long dniTitular)
-        throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException {
+        throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, TipoCuentaNotSupportedException, ClienteNotFoundException {
+
+        // Validar que el cliente exista
+        Cliente titular = clienteDao.find(dniTitular, false);
+        if (titular == null) {
+            throw new ClienteNotFoundException();
+        }
 
         // Convertir Strings a Enums con validación
         TipoCuenta tipoCuenta;
@@ -64,26 +74,22 @@ public class CuentaService {
         // Crear cuenta
         Cuenta cuenta = new Cuenta();
         cuenta.setNumeroCuenta(CuentaIdGenerator.generarNuevoId());
-        cuenta.setBalance(cuentaDto.getSaldoInicial()); 
+        cuenta.setBalance(cuentaDto.getSaldoInicial());
         cuenta.setFechaCreacion(LocalDateTime.now());
         cuenta.setTipoCuenta(tipoCuenta);
         cuenta.setMoneda(tipoMoneda);
+        cuenta.setDniTitular(dniTitular);
 
         darDeAltaCuenta(cuenta, dniTitular);
 
         return cuenta;
     }
 
-
     public Cuenta consultarCuenta(long numeroCuenta) throws CuentaNotFoundException {
         Cuenta cuenta = cuentaDao.find(numeroCuenta);
         if (cuenta == null) {
             throw new CuentaNotFoundException("No se encontró la cuenta con número " + numeroCuenta);
         }
-        
-        Cliente titular = clienteDao.find(cuenta.getTitular().getDni(), false); // Carga mínima
-        cuenta.setTitular(titular);
-
         return cuenta;
     }
 
@@ -105,13 +111,45 @@ public class CuentaService {
         dto.setMoneda(cuenta.getMoneda().name());
         dto.setBalance(cuenta.getBalance());
         dto.setFechaCreacion(cuenta.getFechaCreacion().toString());
-        dto.setTitular(new CuentaConTitularDto.TitularDto(
-                cuenta.getTitular().getDni(),
-                cuenta.getTitular().getNombre()
-        ));
-
+        dto.setTitular(new CuentaConTitularDto.TitularDto(cuenta.getDniTitular(),  "" ));
         return dto;
     }
 
-    
+    public void depositar(long numeroCuenta, double monto) throws CuentaNotFoundException, CantidadNegativaException {
+        if (monto < 0) {
+            throw new CantidadNegativaException();
+        }
+        Cuenta cuenta = consultarCuenta(numeroCuenta);
+        cuenta.setBalance(cuenta.getBalance() + monto);
+        cuentaDao.save(cuenta);
+    }
+
+    public void extraer(long numeroCuenta, double monto) throws CuentaNotFoundException, CantidadNegativaException, NoAlcanzaException {
+        if (monto < 0) {
+            throw new CantidadNegativaException();
+        }
+        Cuenta cuenta = consultarCuenta(numeroCuenta);
+        if (cuenta.getBalance() < monto) {
+            throw new NoAlcanzaException();
+        }
+        cuenta.setBalance(cuenta.getBalance() - monto);
+        cuentaDao.save(cuenta);
+    }
+
+    public void transferir(long origen, long destino, double monto) throws CuentaNotFoundException, CantidadNegativaException, NoAlcanzaException, TipoCuentaNotSupportedException {
+        Cuenta cuentaOrigen = consultarCuenta(origen);
+        Cuenta cuentaDestino = consultarCuenta(destino);
+        if (monto < 0) {
+            throw new CantidadNegativaException();
+        }
+        if (cuentaOrigen.getTipoCuenta() != cuentaDestino.getTipoCuenta()) {
+            throw new TipoCuentaNotSupportedException("Las cuentas deben ser del mismo tipo para transferir.");
+        }
+        if (cuentaOrigen.getMoneda() != cuentaDestino.getMoneda()) {
+            throw new TipoCuentaNotSupportedException("Las cuentas deben ser de la misma moneda para transferir.");
+        }
+
+        extraer(origen, monto);
+        depositar(destino, monto);
+    }
 }

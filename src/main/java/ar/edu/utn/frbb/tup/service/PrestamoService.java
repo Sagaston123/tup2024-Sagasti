@@ -7,8 +7,10 @@ import ar.edu.utn.frbb.tup.model.TipoMoneda;
 import ar.edu.utn.frbb.tup.model.dtos.PrestamoDto;
 import ar.edu.utn.frbb.tup.model.dtos.SolicitudPrestamoResponse;
 import ar.edu.utn.frbb.tup.model.dtos.PlanPagoDto;
+import ar.edu.utn.frbb.tup.model.exception.ClienteNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.PrestamoNotAllowedException;
 import ar.edu.utn.frbb.tup.persistence.PrestamoDao;
+import ar.edu.utn.frbb.tup.persistence.CuentaDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,14 +30,20 @@ public class PrestamoService {
     @Autowired
     private CreditScoringService creditScoringService;
 
-    public SolicitudPrestamoResponse solicitarPrestamo(PrestamoDto prestamoDto) throws PrestamoNotAllowedException {
+    @Autowired
+    private CuentaDao cuentaDao;
+
+    public SolicitudPrestamoResponse solicitarPrestamo(PrestamoDto prestamoDto) throws PrestamoNotAllowedException, ClienteNotFoundException {
         Cliente cliente = clienteService.buscarClientePorDni(prestamoDto.getNumeroCliente());
 
         if (!creditScoringService.tieneBuenHistorial(cliente.getDni())) {
             throw new PrestamoNotAllowedException("El cliente no tiene una buena calificación crediticia.");
         }
 
-        Cuenta cuentaDestino = cliente.getCuentas().stream()
+        // Buscar cuentas del cliente por DNI
+        List<Cuenta> cuentasDelCliente = cuentaDao.getCuentasByCliente(cliente.getDni());
+
+        Cuenta cuentaDestino = cuentasDelCliente.stream()
                 .filter(c -> c.getMoneda().toString().equalsIgnoreCase(prestamoDto.getMoneda()))
                 .findFirst()
                 .orElseThrow(() -> new PrestamoNotAllowedException("El cliente no tiene cuenta en la moneda solicitada."));

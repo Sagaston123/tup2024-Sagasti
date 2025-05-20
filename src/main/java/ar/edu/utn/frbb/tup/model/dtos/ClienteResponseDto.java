@@ -1,7 +1,6 @@
 package ar.edu.utn.frbb.tup.model.dtos;
 
 import ar.edu.utn.frbb.tup.model.Cliente;
-import ar.edu.utn.frbb.tup.model.Cuenta;
 
 import java.util.List;
 
@@ -13,15 +12,13 @@ public class ClienteResponseDto {
     private String tipoPersona;
     private List<Long> cuentas;
 
-    public ClienteResponseDto(Cliente cliente) {
+    public ClienteResponseDto(Cliente cliente, List<Long> cuentas) {
         this.nombre = cliente.getNombre();
         this.apellido = cliente.getApellido();
         this.dni = cliente.getDni();
         this.banco = cliente.getBanco();
         this.tipoPersona = cliente.getTipoPersona() != null ? cliente.getTipoPersona().name() : null;
-        this.cuentas = cliente.getCuentas().stream()
-            .map(Cuenta::getNumeroCuenta)
-            .toList();
+        this.cuentas = cuentas;
     }
 
     public String getNombre() {
@@ -43,7 +40,7 @@ public class ClienteResponseDto {
     public long getDni() {
         return dni;
     }
-
+    
     public void setDni(long dni) {
         this.dni = dni;
     }
@@ -71,5 +68,5 @@ public class ClienteResponseDto {
     public void setCuentas(List<Long> cuentas) {
         this.cuentas = cuentas;
     }
-   
+    
 }
