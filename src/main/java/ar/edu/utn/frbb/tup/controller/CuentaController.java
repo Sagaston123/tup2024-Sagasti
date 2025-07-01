@@ -11,6 +11,7 @@ import ar.edu.utn.frbb.tup.model.exception.CuentaNotFoundException;
 import ar.edu.utn.frbb.tup.model.exception.NoAlcanzaException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaAlreadyExistsException;
 import ar.edu.utn.frbb.tup.model.exception.TipoCuentaNotSupportedException;
+import ar.edu.utn.frbb.tup.model.exception.TransferenciaInvalidaException;
 import ar.edu.utn.frbb.tup.service.CuentaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -90,9 +91,10 @@ public class CuentaController {
             return ResponseEntity.badRequest().body("Saldo insuficiente");
         } catch (TipoCuentaNotSupportedException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (TransferenciaInvalidaException e) {
+            return ResponseEntity.badRequest().body(e.getMessage()); 
         }
     }
-    
 
     @GetMapping
     public List<Cuenta> listarCuentas() {

@@ -20,6 +20,5 @@ public class CuentaValidator {
             throw new IllegalArgumentException("La moneda es obligatoria");
         }
 
-        // Agregar otras validaciones según las consignas
     }
 }

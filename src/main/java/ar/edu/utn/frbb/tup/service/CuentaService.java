@@ -35,6 +35,12 @@ public class CuentaService {
     @Autowired
     private ClienteService clienteService;
 
+    public CuentaService(CuentaDao cuentaDao, ClienteDao clienteDao) {
+    this.cuentaDao = cuentaDao;
+    this.clienteDao = clienteDao;
+    this.clienteService = new ClienteService(clienteDao, cuentaDao);
+}
+
     public void darDeAltaCuenta(Cuenta cuenta, long dniTitular)
             throws CuentaAlreadyExistsException, TipoCuentaAlreadyExistsException, ClienteNotFoundException {
 
