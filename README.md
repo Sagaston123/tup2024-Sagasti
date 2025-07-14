@@ -1,69 +1,57 @@
 # Sistema Bancario extendido a prestamos 2025
-# Para ejecutarlo, primero correr "mvn clean install". 
-# Luego "mvn spring-boot:run". O click en RUN desde la clase Application.java
+
+Para ejecutarlo, primero correr `mvn clean install`. Luego `mvn spring-boot:run`. O click en RUN desde la clase Application.java
+
+## API Endpoints
+
+### 📋 Clientes
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/cliente` | Crear un nuevo cliente |
+| GET | `/cliente/{dni}` | Buscar cliente por DNI |
+| GET | `/cliente` | Listar todos los clientes |
+
+### 💰 Cuentas
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/cuenta` | Crear nueva cuenta bancaria |
+| GET | `/cuenta/{numeroCuenta}` | Consultar cuenta por número |
+| GET | `/cuenta` | Listar todas las cuentas |
+| PUT | `/cuenta/{numeroCuenta}/depositar?monto={valor}` | Depositar dinero en cuenta |
+| PUT | `/cuenta/{numeroCuenta}/extraer?monto={valor}` | Extraer dinero de cuenta |
+| PUT | `/cuenta/transferir?origen={numOrigen}&destino={numDestino}&monto={valor}` | Transferir dinero entre cuentas |
+
+### 🏦 Préstamos
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/prestamo` | Solicitar un nuevo préstamo |
+| GET | `/prestamo/{clienteId}` | Consultar préstamos de un cliente |
 
 ## Endpoints de clientes
 
-### Crear cliente
-- **POST `/cliente`**
-- Crea un nuevo cliente.
-- **Body:** `ClienteDto` (JSON con datos personales)
-- **Respuestas:**  
-  - 200 OK: Cliente creado  
-  - 400/409: Error de validación o cliente ya existe
-
-### Consultar cliente
-- **GET `/cliente/{dni}`**
-- Devuelve los datos del cliente.
-- **Respuestas:**  
-  - 200 OK: Datos del cliente  
-  - 404: Cliente no encontrado
-
-### Listar todos los clientes
-- **GET `/cliente`**
-- Devuelve la lista de todos los clientes del sistema.
-
-### Crear cuenta
-- **POST `/cuenta`**
-- Crea una nueva cuenta bancaria para un cliente existente.
-- **Body:** `CuentaDto` (JSON con datos de la cuenta y el DNI del cliente)
-- **Respuestas:**  
-  - 200 OK: Cuenta creada  
-  - 400/409: Error de validación o cuenta/cliente ya existe
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/cliente` | Crear un nuevo cliente |
+| GET | `/cliente/{dni}` | Buscar cliente por DNI |
+| GET | `/cliente` | Listar todos los clientes |
 
 ## Endpoints de cuentas
 
-### Consultar cuenta
-- **GET `/cuenta/{numeroCuenta}`**
-- Devuelve los datos de la cuenta y su titular.
-- **Respuestas:**  
-  - 200 OK: Datos de la cuenta  
-  - 404: Cuenta no encontrada
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/cuenta` | Crear nueva cuenta bancaria |
+| GET | `/cuenta/{numeroCuenta}` | Consultar cuenta por número |
+| GET | `/cuenta` | Listar todas las cuentas |
+| PUT | `/cuenta/{numeroCuenta}/depositar?monto={valor}` | Depositar dinero en cuenta |
+| PUT | `/cuenta/{numeroCuenta}/extraer?monto={valor}` | Extraer dinero de cuenta |
+| PUT | `/cuenta/transferir?origen={numOrigen}&destino={numDestino}&monto={valor}` | Transferir dinero entre cuentas |
 
-### Depositar dinero
-- **PUT `/cuenta/{numeroCuenta}/depositar?monto={monto}`**
-- Deposita dinero en la cuenta indicada.
-- **Respuestas:**  
-  - 200 OK: Mensaje de éxito  
-  - 400: Monto negativo  
-  - 404: Cuenta no encontrada
+## Endpoints de préstamos
 
-### Extraer dinero
-- **PUT `/cuenta/{numeroCuenta}/extraer?monto={monto}`**
-- Extrae dinero de la cuenta indicada.
-- **Respuestas:**  
-  - 200 OK: Mensaje de éxito  
-  - 400: Monto negativo o saldo insuficiente  
-  - 404: Cuenta no encontrada
-
-### Transferir dinero
-- **PUT `/cuenta/transferir?origen={origen}&destino={destino}&monto={monto}`**
-- Transfiere dinero entre dos cuentas.
-- **Respuestas:**  
-  - 200 OK: Mensaje de éxito  
-  - 400: Monto negativo, saldo insuficiente o tipos incompatibles  
-  - 404: Cuenta no encontrada
-
-### Listar todas las cuentas
-- **GET `/cuenta`**
-- Devuelve la lista de todas las cuentas del sistema.
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/prestamo` | Solicitar un nuevo préstamo |
+| GET | `/prestamo/{clienteId}` | Consultar préstamos de un cliente |
